@@ -15,10 +15,6 @@ $middlewareDispatcher->addMiddleware(new MyFirstMiddleware);
 $middlewareDispatcher->addMiddleware(new MySecondMiddleware);
 $middlewareDispatcher->addMiddleware(new MyThirdMiddleware);
 
-// you can set a request handler which will be called
-// if none of your middlewares are generating a response 
-$middlewareDispatcher->setBaseRequestHandler(new ARequestHandler);
-
 // handling the request
 $psr7Response = $middlewareDispatcher->handle($psr7ServerRequest);
 ```

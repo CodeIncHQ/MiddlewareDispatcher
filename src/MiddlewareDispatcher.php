@@ -46,21 +46,6 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
     private $pointer = 0;
 
     /**
-     * @var RequestHandlerInterface
-     */
-    private $baseRequestHandler;
-
-    /**
-     * MiddlewareDispatcher constructor.
-     *
-     * @param null|RequestHandlerInterface $baseRequestHandler
-     */
-    public function __construct(?RequestHandlerInterface $baseRequestHandler = null)
-    {
-        $this->baseRequestHandler = $baseRequestHandler;
-    }
-
-    /**
      * Add a middleware
      *
      * @param MiddlewareInterface $middleware
@@ -71,29 +56,18 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
     }
 
     /**
-     * @param RequestHandlerInterface $requestHandler
-     */
-    public function setBaseRequestHandler(RequestHandlerInterface $requestHandler) {
-        $this->baseRequestHandler = $requestHandler;
-    }
-
-    /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return ResponseInterface
-     * @throws MiddlewareDispatcherException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
         while ($middleware = $this->getNextMiddleware()) {
             return $middleware->process($request, $this);
         }
-        $this->resetMiddlewarePointer();
-        if (!$this->baseRequestHandler) {
-            throw new MiddlewareDispatcherException("You have'nt set a base request handler "
-                    ."and none of your middlewares are generating a response.", $this);
-        }
-        return $this->baseRequestHandler->handle($request);
+
+        // if no middleware generated a response, sending NoResponseAvailable response
+        return new NoResponseAvailable();
     }
 
     /**
@@ -101,7 +75,7 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
      *
      * @return null|MiddlewareInterface
      */
-    protected function getNextMiddleware():?MiddlewareInterface
+    public function getNextMiddleware():?MiddlewareInterface
     {
         if (isset($this->middlewares[$this->pointer])) {
             return $this->middlewares[$this->pointer++];
@@ -112,7 +86,7 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
     /**
      * Resets the internal middlewares stack's pointer.
      */
-    protected function resetMiddlewarePointer():void
+    public function resetMiddlewarePointer():void
     {
         $this->pointer = 0;
     }
