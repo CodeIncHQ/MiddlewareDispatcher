@@ -23,8 +23,6 @@ declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -33,26 +31,33 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregate, \Countable
+class MiddlewareDispatcher extends MiddlewareCollection implements MiddlewareDispatcherInterface
 {
     /**
-     * @var MiddlewareInterface[]
+     * @var ResponseInterface|null
+     * @see MiddlewareDispatcher::getDefaultResponse()
      */
-    private $middlewares = [];
+    private $defaultResponse;
 
     /**
-     * @var int
-     */
-    private $pointer = 0;
-
-    /**
-     * Add a middleware
+     * MiddlewareDispatcher constructor.
      *
-     * @param MiddlewareInterface $middleware
+     * @param iterable|null $middleware
+     * @param null $defaultResponse
+     * @throws MiddlewareDispatcherException
      */
-    public function addMiddleware(MiddlewareInterface $middleware):void
+    public function __construct(?iterable $middleware = null, ?$defaultResponse = null)
     {
-        $this->middlewares[] = $middleware;
+        parent::__construct($middleware);
+        $this->defaultResponse = $defaultResponse;
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function getDefaultResponse():ResponseInterface
+    {
+        return $this->defaultResponse ?? new NoResponseAvailable();
     }
 
     /**
@@ -62,49 +67,13 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        while ($middleware = $this->getNextMiddleware()) {
+        while ($this->valid()) {
+            $middleware = $this->current();
+            $this->next();
             return $middleware->process($request, $this);
         }
 
         // if no middleware generated a response, sending NoResponseAvailable response
-        return new NoResponseAvailable();
-    }
-
-    /**
-     * Returns the next middleware from withing the internal stack.
-     *
-     * @return null|MiddlewareInterface
-     */
-    public function getNextMiddleware():?MiddlewareInterface
-    {
-        return $this->middlewares[$this->pointer++] ?? null;
-    }
-
-    /**
-     * Resets the internal middlewares stack's pointer.
-     */
-    public function resetMiddlewarePointer():void
-    {
-        $this->pointer = 0;
-    }
-
-    /**
-     * @inheritdoc
-     * @return \Generator
-     */
-    public function getIterator():\Generator
-    {
-        foreach ($this->middlewares as $middleware) {
-            yield $middleware;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     * @return int
-     */
-    public function count():int
-    {
-        return count($this->middlewares);
+        return $this->getDefaultResponse();
     }
 }
