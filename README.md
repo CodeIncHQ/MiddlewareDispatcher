@@ -43,7 +43,7 @@ $psr7Response = $middlewareDispatcher->process($psr7ServerRequest, $psr15Request
 ``` 
 
 
-Optionnaly you can use [`MiddlewareCollection`](src/MiddlewareCollection.php) in order to modify the collection or middlewares after instantiating the dispatcher:
+Optionnaly you can use [`MiddlewareCollection`](src/MiddlewareCollection.php) in order to add extra middleware objects after instantiating the dispatcher:
 ```php
 <?php
 use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
