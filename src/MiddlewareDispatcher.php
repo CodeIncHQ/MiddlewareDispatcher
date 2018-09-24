@@ -23,6 +23,8 @@ declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use SebastianBergmann\CodeCoverage\Node\Iterator;
 
 
 /**
@@ -31,10 +33,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareDispatcher implements MiddlewareDispatcherInterface
+class MiddlewareDispatcher implements MiddlewareDispatcherInterface, \IteratorAggregate
 {
     /**
-     * @var MiddlewareCollection
+     * @var iterable
      */
     private $middleware;
 
@@ -47,22 +49,47 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
     /**
      * MiddlewareDispatcher constructor.
      *
-     * @param MiddlewareCollection|null $middlewareCollection
+     * @param iterable|null $middleware
      * @param null $defaultResponse
-     * @throws MiddlewareDispatcherException
      */
-    public function __construct(?MiddlewareCollection $middlewareCollection = null, ?$defaultResponse = null)
+    public function __construct(iterable $middleware, ?$defaultResponse = null)
     {
-        $this->middleware = $middlewareCollection ?? new MiddlewareCollection();
+        $this->setMiddleware($middleware);
+        if ($defaultResponse !== null) {
+            $this->setDefaultResponse($defaultResponse);
+        }
+    }
+
+    /**
+     * @param ResponseInterface $defaultResponse
+     */
+    public function setDefaultResponse(ResponseInterface $defaultResponse):void
+    {
         $this->defaultResponse = $defaultResponse;
     }
 
     /**
-     * @return MiddlewareCollectionInterface
+     * @param iterable $middleware
      */
-    public function getMiddleware():MiddlewareCollectionInterface
+    public function setMiddleware(iterable $middleware):void
+    {
+        $this->middleware = $middleware;
+    }
+
+    /**
+     * @return Iterator
+     */
+    public function getMiddleware():iterable
     {
         return $this->middleware;
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getIterator():\Iterator
+    {
+        yield from $this->middleware;
     }
 
     /**
@@ -77,12 +104,16 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws MiddlewareDispatcherException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        while ($this->getMiddleware()->valid()) {
-            $middleware = $this->getMiddleware()->current();
-            $this->getMiddleware()->next();
+        while ($this->getIterator()->valid()) {
+            $middleware = $this->getIterator()->current();
+            if (!$middleware instanceof MiddlewareInterface) {
+                throw MiddlewareDispatcherException::notAMiddleware($middleware);
+            }
+            $this->getIterator()->next();
             return $middleware->process($request, $this);
         }
 

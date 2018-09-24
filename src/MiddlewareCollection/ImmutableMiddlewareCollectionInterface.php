@@ -19,22 +19,23 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\MiddlewareDispatcher\MiddlewareCollection;
+use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
- * Interface MiddlewareDispatcherInterface
+ * Interface MiddlewareCollectionInterface
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MiddlewareDispatcherInterface extends RequestHandlerInterface
+interface ImmutableMiddlewareCollectionInterface extends MiddlewareCollectionInterface
 {
     /**
-     * Returns the middleware.
+     * Returns a clone of the collection with an extra middleware.
      *
-     * @return iterable
+     * @param MiddlewareInterface $middleware
+     * @return ImmutableMiddlewareCollectionInterface
      */
-    public function getMiddleware():iterable;
+    public function withMiddleware(MiddlewareInterface $middleware):self;
 }

@@ -19,22 +19,43 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher;
-use Psr\Http\Server\RequestHandlerInterface;
+namespace CodeInc\MiddlewareDispatcher\MiddlewareCollection;
+use CodeInc\MiddlewareDispatcher\MiddlewareDispatcherException;
+use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
- * Interface MiddlewareDispatcherInterface
+ * Class MutableMiddlewareCollection
  *
- * @package CodeInc\MiddlewareDispatcher
+ * @package CodeInc\MiddlewareDispatcher\MiddlewareCollection
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MiddlewareDispatcherInterface extends RequestHandlerInterface
+class MutableMiddlewareCollection extends AbstractMiddlewareCollection implements MutableMiddlewareCollectionInterface
 {
     /**
-     * Returns the middleware.
+     * MiddlewareCollection constructor.
      *
-     * @return iterable
+     * @param iterable|null $middleware
+     * @throws MiddlewareDispatcherException
      */
-    public function getMiddleware():iterable;
+    public function __construct(?iterable $middleware = null)
+    {
+        if ($middleware !== null) {
+            foreach ($middleware as $item) {
+                if (!$item instanceof MiddlewareInterface) {
+                    throw MiddlewareDispatcherException::notAMiddleware($item);
+                }
+                $this->addMiddleware($item);
+            }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     * @param MiddlewareInterface $middleware
+     */
+    public function addMiddleware(MiddlewareInterface $middleware):void
+    {
+        $this->middleware[] = $middleware;
+    }
 }

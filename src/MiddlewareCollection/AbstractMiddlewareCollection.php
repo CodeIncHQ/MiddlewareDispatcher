@@ -19,7 +19,7 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher;
+namespace CodeInc\MiddlewareDispatcher\MiddlewareCollection;
 use Psr\Http\Server\MiddlewareInterface;
 
 
@@ -29,12 +29,12 @@ use Psr\Http\Server\MiddlewareInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareCollection implements MiddlewareCollectionInterface
+class AbstractMiddlewareCollection implements MiddlewareCollectionInterface
 {
     /**
      * @var MiddlewareInterface[]
      */
-    private $middleware = [];
+    protected $middleware = [];
 
     /**
      * @var int|null
@@ -42,38 +42,37 @@ class MiddlewareCollection implements MiddlewareCollectionInterface
     private $iteratorPosition;
 
     /**
-     * MiddlewareCollection constructor.
-     *
-     * @param iterable|null $middleware
-     * @throws MiddlewareDispatcherException
+     * @inheritdoc
+     * @return int
      */
-    public function __construct(?iterable $middleware = null)
+    public function count():int
     {
-        if ($middleware !== null) {
-            $this->addMiddlewares($middleware);
-        }
+        return count($this->middleware);
     }
 
     /**
-     * @param MiddlewareInterface $middleware
+     * @inheritdoc
      */
-    public function addMiddleware(MiddlewareInterface $middleware):void
+    public function rewind():void
     {
-        $this->middleware[] = $middleware;
+        $this->iteratorPosition = 0;
     }
 
     /**
-     * @param iterable $middleware
-     * @throws MiddlewareDispatcherException
+     * @inheritdoc
      */
-    public function addMiddlewares(iterable $middleware):void
+    public function next():void
     {
-        foreach ($middleware as $item) {
-            if (!$item instanceof MiddlewareInterface) {
-                throw MiddlewareDispatcherException::notAMiddleware($item);
-            }
-            $this->addMiddleware($item);
-        }
+        $this->iteratorPosition++;
+    }
+
+    /**
+     * @inheritdoc
+     * @return bool
+     */
+    public function valid():bool
+    {
+        return array_key_exists($this->iteratorPosition, $this->middleware);
     }
 
     /**
@@ -92,39 +91,5 @@ class MiddlewareCollection implements MiddlewareCollectionInterface
     public function key():int
     {
         return $this->iteratorPosition;
-    }
-
-    /**
-     * @inheritdoc
-     * @return bool
-     */
-    public function valid():bool
-    {
-        return array_key_exists($this->iteratorPosition, $this->middleware);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function next():void
-    {
-        $this->iteratorPosition++;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rewind():void
-    {
-        $this->iteratorPosition = 0;
-    }
-
-    /**
-     * @inheritdoc
-     * @return int
-     */
-    public function count():int
-    {
-        return count($this->middleware);
     }
 }
