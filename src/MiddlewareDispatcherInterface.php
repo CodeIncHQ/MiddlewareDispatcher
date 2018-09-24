@@ -29,6 +29,10 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MiddlewareDispatcherInterface extends RequestHandlerInterface, MiddlewareCollectionInterface
+interface MiddlewareDispatcherInterface extends RequestHandlerInterface
 {
+    /**
+     * @return MiddlewareCollectionInterface
+     */
+    public function getMiddleware():MiddlewareCollectionInterface;
 }

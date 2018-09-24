@@ -31,8 +31,13 @@ use Psr\Http\Message\ServerRequestInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareDispatcher extends MiddlewareCollection implements MiddlewareDispatcherInterface
+class MiddlewareDispatcher implements MiddlewareDispatcherInterface
 {
+    /**
+     * @var MiddlewareCollection
+     */
+    private $middleware;
+
     /**
      * @var ResponseInterface|null
      * @see MiddlewareDispatcher::getDefaultResponse()
@@ -42,14 +47,22 @@ class MiddlewareDispatcher extends MiddlewareCollection implements MiddlewareDis
     /**
      * MiddlewareDispatcher constructor.
      *
-     * @param iterable|null $middleware
+     * @param MiddlewareCollection|null $middlewareCollection
      * @param null $defaultResponse
      * @throws MiddlewareDispatcherException
      */
-    public function __construct(?iterable $middleware = null, ?$defaultResponse = null)
+    public function __construct(?MiddlewareCollection $middlewareCollection = null, ?$defaultResponse = null)
     {
-        parent::__construct($middleware);
+        $this->middleware = $middlewareCollection ?? new MiddlewareCollection();
         $this->defaultResponse = $defaultResponse;
+    }
+
+    /**
+     * @return MiddlewareCollectionInterface
+     */
+    public function getMiddleware():MiddlewareCollectionInterface
+    {
+        return $this->middleware;
     }
 
     /**
@@ -67,9 +80,9 @@ class MiddlewareDispatcher extends MiddlewareCollection implements MiddlewareDis
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        while ($this->valid()) {
-            $middleware = $this->current();
-            $this->next();
+        while ($this->getMiddleware()->valid()) {
+            $middleware = $this->getMiddleware()->current();
+            $this->getMiddleware()->next();
             return $middleware->process($request, $this);
         }
 
