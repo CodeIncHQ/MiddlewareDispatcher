@@ -77,10 +77,7 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
      */
     public function getNextMiddleware():?MiddlewareInterface
     {
-        if (isset($this->middlewares[$this->pointer])) {
-            return $this->middlewares[$this->pointer++];
-        }
-        return null;
+        return $this->middlewares[$this->pointer++] ?? null;
     }
 
     /**
@@ -93,11 +90,13 @@ class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregat
 
     /**
      * @inheritdoc
-     * @return \ArrayIterator
+     * @return \Generator
      */
-    public function getIterator():\ArrayIterator
+    public function getIterator():\Generator
     {
-        return new \ArrayIterator($this->middlewares);
+        foreach ($this->middlewares as $middleware) {
+            yield $middleware;
+        }
     }
 
     /**
