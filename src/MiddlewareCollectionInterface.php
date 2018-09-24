@@ -20,6 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
+use CodeInc\CollectionInterface\CollectionInterface;
 use Psr\Http\Server\MiddlewareInterface;
 
 
@@ -29,7 +30,7 @@ use Psr\Http\Server\MiddlewareInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MiddlewareCollectionInterface extends \Iterator, \Countable
+interface MiddlewareCollectionInterface extends CollectionInterface
 {
     /**
      * @inheritdoc
