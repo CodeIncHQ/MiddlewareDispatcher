@@ -24,7 +24,7 @@ namespace CodeInc\MiddlewareDispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use SebastianBergmann\CodeCoverage\Node\Iterator;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -41,31 +41,13 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface, \IteratorAg
     private $middleware;
 
     /**
-     * @var ResponseInterface|null
-     * @see MiddlewareDispatcher::getDefaultResponse()
-     */
-    private $defaultResponse;
-
-    /**
      * MiddlewareDispatcher constructor.
      *
      * @param iterable|null $middleware
-     * @param null $defaultResponse
      */
-    public function __construct(iterable $middleware, ?$defaultResponse = null)
+    public function __construct(iterable $middleware)
     {
         $this->setMiddleware($middleware);
-        if ($defaultResponse !== null) {
-            $this->setDefaultResponse($defaultResponse);
-        }
-    }
-
-    /**
-     * @param ResponseInterface $defaultResponse
-     */
-    public function setDefaultResponse(ResponseInterface $defaultResponse):void
-    {
-        $this->defaultResponse = $defaultResponse;
     }
 
     /**
@@ -77,33 +59,8 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface, \IteratorAg
     }
 
     /**
-     * @return Iterator
-     */
-    public function getMiddleware():iterable
-    {
-        return $this->middleware;
-    }
-
-    /**
-     * @return \Generator
-     */
-    public function getIterator():\Iterator
-    {
-        yield from $this->middleware;
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getDefaultResponse():ResponseInterface
-    {
-        return $this->defaultResponse ?? new NoResponseAvailable();
-    }
-
-    /**
-     * @inheritdoc
      * @param ServerRequestInterface $request
-     * @return ResponseInterface
+     * @return null|ResponseInterface
      * @throws MiddlewareDispatcherException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
@@ -118,6 +75,42 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface, \IteratorAg
         }
 
         // if no middleware generated a response, sending NoResponseAvailable response
-        return $this->getDefaultResponse();
+        return new NoResponseAvailable();
+    }
+
+    /**
+     * @inheritdoc
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     * @throws MiddlewareDispatcherException
+     */
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    {
+        $resp = $this->handle($request);
+        if (!$resp instanceof NoResponseAvailable) {
+            return $resp;
+        }
+        else {
+            return $handler->handle($request);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     * @return iterable
+     */
+    public function getMiddleware():iterable
+    {
+        return $this->middleware;
+    }
+
+    /**
+     * @inheritdoc
+     * @return \Generator
+     */
+    public function getIterator():\Generator
+    {
+        yield from $this->middleware;
     }
 }

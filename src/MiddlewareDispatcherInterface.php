@@ -20,6 +20,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 
@@ -29,7 +30,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MiddlewareDispatcherInterface extends RequestHandlerInterface
+interface MiddlewareDispatcherInterface extends MiddlewareInterface, RequestHandlerInterface
 {
     /**
      * Returns the middleware.
