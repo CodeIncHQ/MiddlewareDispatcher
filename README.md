@@ -6,6 +6,7 @@ If the dispatcher is used as a request handler and if non of it's middleware can
 
 ## Usage
 
+Usage of the dispatcher behaving as a PSR-15 request handler:
 ```php
 <?php
 use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
@@ -23,7 +24,7 @@ $middlewareDispatcher = new MiddlewareDispatcher([
 $psr7Response = $middlewareDispatcher->handle($psr7ServerRequest); 
 ```
 
-The dispatcher can also behanve as a middlware and be used within other middlewares:
+The dispatcher can also behave as a PSR-15 middlware:
 ```php
 <?php
 use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
