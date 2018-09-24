@@ -19,22 +19,30 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher\MiddlewareCollection;
-use CodeInc\MiddlewareDispatcher\MiddlewareDispatcherException;
+namespace CodeInc\MiddlewareDispatcher;
 use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
- * Class ImmutableMiddlewareCollection
+ * Class MiddlewareCollection
  *
- * @package CodeInc\MiddlewareDispatcher\MiddlewareCollection
+ * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class ImmutableMiddlewareCollection extends AbstractMiddlewareCollection
-    implements ImmutableMiddlewareCollectionInterface
+class MiddlewareCollection implements MiddlewareCollectionInterface
 {
     /**
-     * ImmutableMiddlewareCollection constructor.
+     * @var MiddlewareInterface[]
+     */
+    private $middleware = [];
+
+    /**
+     * @var int|null
+     */
+    private $iteratorPosition;
+
+    /**
+     * MiddlewareCollection constructor.
      *
      * @param iterable|null $middleware
      * @throws MiddlewareDispatcherException
@@ -52,22 +60,55 @@ class ImmutableMiddlewareCollection extends AbstractMiddlewareCollection
     }
 
     /**
+     * Adds a middleware to the collection.
+     *
      * @param MiddlewareInterface $middleware
      */
-    private function addMiddleware(MiddlewareInterface $middleware):void
+    public function addMiddleware(MiddlewareInterface $middleware):void
     {
         $this->middleware[] = $middleware;
     }
 
     /**
      * @inheritdoc
-     * @param MiddlewareInterface $middleware
-     * @return ImmutableMiddlewareCollectionInterface
      */
-    public function withMiddleware(MiddlewareInterface $middleware):ImmutableMiddlewareCollectionInterface
+    public function rewind():void
     {
-        $collection = clone $this;
-        $collection->addMiddleware($middleware);
-        return $collection;
+        $this->iteratorPosition = 0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function next():void
+    {
+        $this->iteratorPosition++;
+    }
+
+    /**
+     * @inheritdoc
+     * @return bool
+     */
+    public function valid():bool
+    {
+        return array_key_exists($this->iteratorPosition, $this->middleware);
+    }
+
+    /**
+     * @inheritdoc
+     * @return MiddlewareInterface
+     */
+    public function current():MiddlewareInterface
+    {
+        return $this->middleware[$this->iteratorPosition];
+    }
+
+    /**
+     * @inheritdoc
+     * @return int
+     */
+    public function key():int
+    {
+        return $this->iteratorPosition;
     }
 }

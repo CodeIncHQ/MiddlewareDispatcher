@@ -19,7 +19,8 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher\MiddlewareCollection;
+namespace CodeInc\MiddlewareDispatcher;
+use CodeInc\CollectionInterface\CollectionInterface;
 use Psr\Http\Server\MiddlewareInterface;
 
 
@@ -29,12 +30,17 @@ use Psr\Http\Server\MiddlewareInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-interface MutableMiddlewareCollectionInterface extends MiddlewareCollectionInterface
+interface MiddlewareCollectionInterface extends CollectionInterface
 {
     /**
-     * Adds a middleware to the collection.
-     *
-     * @param MiddlewareInterface $middleware
+     * @inheritdoc
+     * @return MiddlewareInterface
      */
-    public function addMiddleware(MiddlewareInterface $middleware):void;
+    public function current():MiddlewareInterface;
+
+    /**
+     * @inheritdoc
+     * @return int
+     */
+    public function key():int;
 }
