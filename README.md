@@ -24,7 +24,7 @@ $middlewareDispatcher = new MiddlewareDispatcher([
 $psr7Response = $middlewareDispatcher->handle($psr7ServerRequest); 
 ```
 
-The dispatcher can also behave as a PSR-15 middlware:
+Usage of the dispatcher behaving as a PSR-15 middlware:
 ```php
 <?php
 use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
