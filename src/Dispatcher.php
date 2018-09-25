@@ -29,6 +29,8 @@ use Psr\Http\Server\MiddlewareInterface;
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
+ * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
 final class Dispatcher extends AbstractDispatcher
 {

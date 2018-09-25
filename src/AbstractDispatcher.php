@@ -32,6 +32,8 @@ use Psr\Http\Server\RequestHandlerInterface;
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
+ * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
 abstract class AbstractDispatcher implements \IteratorAggregate, RequestHandlerInterface
 {
