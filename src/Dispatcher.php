@@ -35,19 +35,27 @@ use Psr\Http\Server\MiddlewareInterface;
 final class Dispatcher extends AbstractDispatcher
 {
     /**
-     * @var iterable
+     * @var MiddlewareInterface[]
      */
-    private $middleware;
+    private $middleware = [];
+
+    /**
+     * @var \Traversable|null
+     */
+    private $externalIterator;
 
     /**
      * Dispatcher constructor.
      *
-     * @param array|null $middleware
+     * @param iterable|null $middleware
      * @throws DispatcherException
      */
-    public function __construct(?array $middleware = null)
+    public function __construct(?iterable $middleware = null)
     {
-        if ($middleware !== null) {
+        if ($middleware instanceof \Traversable) {
+            $this->externalIterator = $middleware;
+        }
+        else if ($middleware !== null) {
             foreach ($middleware as $item) {
                 if (!$item instanceof MiddlewareInterface) {
                     throw DispatcherException::notAMiddleware($item);
@@ -70,9 +78,20 @@ final class Dispatcher extends AbstractDispatcher
     /**
      * @inheritdoc
      * @return \Generator|MiddlewareInterface[]
+     * @throws DispatcherException
      */
-    public function getMiddleware():\Iterator
+    public function getMiddleware():iterable
     {
-        yield from $this->middleware;
+        if ($this->externalIterator) {
+            foreach ($this->externalIterator as $middleware) {
+                if (!$middleware instanceof MiddlewareInterface) {
+                    throw DispatcherException::notAMiddleware($middleware);
+                }
+                yield $middleware;
+            }
+        }
+        if (!empty($this->middleware)) {
+            yield from $this->middleware;
+        }
     }
 }
