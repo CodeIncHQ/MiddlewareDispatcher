@@ -42,10 +42,10 @@ final class Dispatcher extends AbstractDispatcher
     /**
      * Dispatcher constructor.
      *
-     * @param iterable|null $middleware
+     * @param array|null $middleware
      * @throws DispatcherException
      */
-    public function __construct(?iterable $middleware = null)
+    public function __construct(?array $middleware = null)
     {
         if ($middleware !== null) {
             foreach ($middleware as $item) {
@@ -69,10 +69,10 @@ final class Dispatcher extends AbstractDispatcher
 
     /**
      * @inheritdoc
-     * @return MiddlewareInterface[]
+     * @return \Generator|MiddlewareInterface[]
      */
-    public function getMiddleware():iterable
+    public function getMiddleware():\Iterator
     {
-        return $this->middleware;
+        yield from $this->middleware;
     }
 }

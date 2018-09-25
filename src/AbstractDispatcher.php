@@ -40,9 +40,9 @@ abstract class AbstractDispatcher implements RequestHandlerInterface
     /**
      * Returns the middleware.
      *
-     * @return iterable|MiddlewareInterface[]
+     * @return \Iterator|MiddlewareInterface[]
      */
-    abstract public function getMiddleware():iterable;
+    abstract public function getMiddleware():\Iterator;
 
     /**
      * @inheritdoc
