@@ -35,7 +35,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
  * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-abstract class AbstractDispatcher implements RequestHandlerInterface
+abstract class AbstractDispatcher implements MiddlewareInterface, RequestHandlerInterface
 {
     /**
      * Returns the middleware.
@@ -45,12 +45,22 @@ abstract class AbstractDispatcher implements RequestHandlerInterface
     abstract public function getMiddleware():iterable;
 
     /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     * @throws DispatcherException
+     */
+    public function handle(ServerRequestInterface $request):ResponseInterface
+    {
+        return $this->process($request, $this);
+    }
+
+    /**
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return null|ResponseInterface
      * @throws DispatcherException
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
         while ($this->getIterator()->valid()) {
             $middleware = $this->getIterator()->current();
