@@ -37,12 +37,12 @@ final class Dispatcher extends AbstractDispatcher
     /**
      * @var MiddlewareInterface[]
      */
-    private $middleware = [];
+    private $middlewareRegistry = [];
 
     /**
      * @var \Traversable|null
      */
-    private $externalIterator;
+    private $middlewareIterator;
 
     /**
      * Dispatcher constructor.
@@ -53,7 +53,7 @@ final class Dispatcher extends AbstractDispatcher
     public function __construct(?iterable $middleware = null)
     {
         if ($middleware instanceof \Traversable) {
-            $this->externalIterator = $middleware;
+            $this->middlewareIterator = $middleware;
         }
         else if ($middleware !== null) {
             foreach ($middleware as $item) {
@@ -72,7 +72,7 @@ final class Dispatcher extends AbstractDispatcher
      */
     public function addMiddleware(MiddlewareInterface $middleware):void
     {
-        $this->middleware[] = $middleware;
+        $this->middlewareRegistry[] = $middleware;
     }
 
     /**
@@ -82,16 +82,16 @@ final class Dispatcher extends AbstractDispatcher
      */
     public function getMiddleware():iterable
     {
-        if ($this->externalIterator) {
-            foreach ($this->externalIterator as $middleware) {
+        if ($this->middlewareIterator) {
+            foreach ($this->middlewareIterator as $middleware) {
                 if (!$middleware instanceof MiddlewareInterface) {
                     throw DispatcherException::notAMiddleware($middleware);
                 }
                 yield $middleware;
             }
         }
-        if (!empty($this->middleware)) {
-            yield from $this->middleware;
+        if (!empty($this->middlewareRegistry)) {
+            yield from $this->middlewareRegistry;
         }
     }
 }
