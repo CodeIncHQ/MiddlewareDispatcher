@@ -14,9 +14,9 @@ use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
 // instantiating the dispatcher
 $middlewareDispatcher = new MiddlewareDispatcher([
     new MyFirstMiddleware(),
-    new MySecondMiddleware(),
-    new MyThirdMiddleware()
+    new MySecondMiddleware()
 ]);
+$middlewareDispatcher->addMiddleware(new MyThirdMiddleware());
 
 // handling the request 
 // will return a NoResponseAvailable object if the request can not be processed by the middleware
@@ -40,32 +40,6 @@ $middlewareDispatcher = new MiddlewareDispatcher([
 // --> $psr7ServerRequest must be an object implementing ServerRequestInterface
 // --> $psr15RequestHandler must be an object implementing RequestHandlerInterface
 $psr7Response = $middlewareDispatcher->process($psr7ServerRequest, $psr15RequestHandler); 
-``` 
-
-
-Optionnaly you can use [`MiddlewareCollection`](src/MiddlewareCollection.php) in order to add extra middleware objects after instantiating the dispatcher:
-```php
-<?php
-use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
-use CodeInc\MiddlewareDispatcher\MiddlewareCollection;
-use GuzzleHttp\Psr7\ServerRequest;
-
-// creating the collection
-$middlewareCollection = new MiddlewareCollection([
-    new MyFirstMiddleware(),
-    new MySecondMiddleware(),
-]);
-
-// instantiating the dispatcher
-$middlewareDispatcher = new MiddlewareDispatcher($middlewareCollection);
-
-// adding an extra middleware
-// --> will be process even if added after the dispatcher instantiation
-$middlewareCollection->addMiddleware(new MyThirdMiddleware()); 
-
-// handling the request 
-// --> $psr7ServerRequest must be an object implementing ServerRequestInterface
-$psr7Response = $middlewareDispatcher->handle($psr7ServerRequest); 
 ``` 
 
 ## Installation

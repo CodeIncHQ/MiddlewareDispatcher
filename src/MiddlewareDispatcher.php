@@ -21,10 +21,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -33,7 +30,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareDispatcher implements MiddlewareDispatcherInterface, \IteratorAggregate
+class MiddlewareDispatcher extends AbstractMiddlewareDispatcher
 {
     /**
      * @var iterable
@@ -44,73 +41,36 @@ class MiddlewareDispatcher implements MiddlewareDispatcherInterface, \IteratorAg
      * MiddlewareDispatcher constructor.
      *
      * @param iterable|null $middleware
-     */
-    public function __construct(iterable $middleware)
-    {
-        $this->setMiddleware($middleware);
-    }
-
-    /**
-     * @param iterable $middleware
-     */
-    public function setMiddleware(iterable $middleware):void
-    {
-        $this->middleware = $middleware;
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return null|ResponseInterface
      * @throws MiddlewareDispatcherException
      */
-    public function handle(ServerRequestInterface $request):ResponseInterface
+    public function __construct(?iterable $middleware = null)
     {
-        while ($this->getIterator()->valid()) {
-            $middleware = $this->getIterator()->current();
-            if (!$middleware instanceof MiddlewareInterface) {
-                throw MiddlewareDispatcherException::notAMiddleware($middleware);
+        if ($middleware !== null) {
+            foreach ($middleware as $item) {
+                if (!$item instanceof MiddlewareInterface) {
+                    throw MiddlewareDispatcherException::notAMiddleware($item);
+                }
+                $this->addMiddleware($item);
             }
-            $this->getIterator()->next();
-            return $middleware->process($request, $this);
         }
-
-        // if no middleware generated a response, sending NoResponseAvailable response
-        return new NoResponseAvailable();
     }
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     * @throws MiddlewareDispatcherException
+     * Adds a middleware to the dispatcher.
+     *
+     * @param MiddlewareInterface $middleware
      */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
+    public function addMiddleware(MiddlewareInterface $middleware):void
     {
-        $resp = $this->handle($request);
-        if (!$resp instanceof NoResponseAvailable) {
-            return $resp;
-        }
-        else {
-            return $handler->handle($request);
-        }
+        $this->middleware[] = $middleware;
     }
 
     /**
      * @inheritdoc
      * @return iterable
      */
-    public function getMiddleware():iterable
+    public function getMiddleware():\Iterator
     {
-        return $this->middleware;
-    }
-
-    /**
-     * @inheritdoc
-     * @return \Generator
-     */
-    public function getIterator():\Generator
-    {
-        yield from $this->middleware;
+        return new \ArrayIterator($this->middleware);
     }
 }
