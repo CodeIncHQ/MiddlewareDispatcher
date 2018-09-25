@@ -22,18 +22,18 @@ declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
 
 /**
- * Class MiddlewareDispatcherException
+ * Class DispatcherException
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareDispatcherException extends \Exception
+class DispatcherException extends \Exception
 {
     public const CODE_NOT_A_MIDDLEWARE = 1;
 
     /**
      * @param $item
-     * @return MiddlewareDispatcherException
+     * @return DispatcherException
      */
     public static function notAMiddleware($item):self
     {

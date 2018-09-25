@@ -3,74 +3,67 @@
 // +---------------------------------------------------------------------+
 // | CODE INC. SOURCE CODE                                               |
 // +---------------------------------------------------------------------+
-// | Copyright (c) 2017 - Code Inc. SAS - All Rights Reserved.           |
+// | Copyright (c) 2018 - Code Inc. SAS - All Rights Reserved.           |
 // | Visit https://www.codeinc.fr for more information about licensing.  |
 // +---------------------------------------------------------------------+
 // | NOTICE:  All information contained herein is, and remains the       |
 // | property of Code Inc. SAS. The intellectual and technical concepts  |
 // | contained herein are proprietary to Code Inc. SAS are protected by  |
 // | trade secret or copyright law. Dissemination of this information or |
-// | reproduction of this material  is strictly forbidden unless prior   |
+// | reproduction of this material is strictly forbidden unless prior    |
 // | written permission is obtained from Code Inc. SAS.                  |
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     10/04/2018
-// Time:     18:49
+// Date:     25/09/2018
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class MiddlewareDispatcher
+ * Class DispatcherMiddlewareWrapper
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class MiddlewareDispatcher extends AbstractMiddlewareDispatcher
+class DispatcherMiddlewareWrapper implements MiddlewareInterface
 {
     /**
-     * @var iterable
+     * @var AbstractDispatcher
      */
-    private $middleware;
+    private $dispatcher;
 
     /**
-     * MiddlewareDispatcher constructor.
+     * DispatcherMiddlewareWrapper constructor.
      *
-     * @param iterable|null $middleware
-     * @throws MiddlewareDispatcherException
+     * @param AbstractDispatcher $dispatcher
      */
-    public function __construct(?iterable $middleware = null)
+    public function __construct(AbstractDispatcher $dispatcher)
     {
-        if ($middleware !== null) {
-            foreach ($middleware as $item) {
-                if (!$item instanceof MiddlewareInterface) {
-                    throw MiddlewareDispatcherException::notAMiddleware($item);
-                }
-                $this->addMiddleware($item);
-            }
-        }
-    }
-
-    /**
-     * Adds a middleware to the dispatcher.
-     *
-     * @param MiddlewareInterface $middleware
-     */
-    public function addMiddleware(MiddlewareInterface $middleware):void
-    {
-        $this->middleware[] = $middleware;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * @inheritdoc
-     * @return iterable
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     * @throws DispatcherException
      */
-    public function getMiddleware():\Iterator
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        return new \ArrayIterator($this->middleware);
+        $resp = $this->dispatcher->handle($request);
+        if (!$resp instanceof NoResponseAvailable) {
+            return $resp;
+        }
+        else {
+            return $handler->handle($request);
+        }
     }
 }

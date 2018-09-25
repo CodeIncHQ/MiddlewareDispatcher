@@ -1,36 +1,39 @@
 # PSR-15 middleware dispatcher
 
-`codeinc/middleware-dispatcher` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware dispatcher. The middleware dispatcher can behave as a PSR-15 [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface) or a PSR-15 [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface).
+`codeinc/middleware-dispatcher` is a [PSR-15](https://www.php-fig.org/psr/psr-15/) middleware dispatcher. The middleware dispatcher can behave as a PSR-15 [`RequestHandlerInterface`](https://www.php-fig.org/psr/psr-15/#21-psrhttpserverrequesthandlerinterface). It comes in two forms, an abstract class [`AbstractDispatcher`](src/AbstractDispatcher.php) to be extended and a final class [`Dispatcher`](src/Dispatcher.php).
 
-If the dispatcher is used as a request handler and if non of it's middleware can handle the request, a [`NoResponseAvailable`](src/NoResponseAvailable.php) PSR-7 response is returned 
+The class [`DispatcherMiddlewareWrapper`](src/DispatcherMiddlewareWrapper.php) alllowes to use the dispatcher as a PSR-15 [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface).
+
+If the dispatcher is used as a request handler and if it can't handle the request, a [`NoResponseAvailable`](src/NoResponseAvailable.php) PSR-7 response is returned.
 
 ## Usage
 
 Usage of the dispatcher behaving as a PSR-15 request handler:
 ```php
 <?php
-use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
+use CodeInc\MiddlewareDispatcher\Dispatcher;
 
 // instantiating the dispatcher
-$middlewareDispatcher = new MiddlewareDispatcher([
+$dispatcher = new Dispatcher([
     new MyFirstMiddleware(),
     new MySecondMiddleware()
 ]);
-$middlewareDispatcher->addMiddleware(new MyThirdMiddleware());
+$dispatcher->addMiddleware(new MyThirdMiddleware());
 
 // handling the request 
 // will return a NoResponseAvailable object if the request can not be processed by the middleware
 // --> $psr7ServerRequest must be an object implementing ServerRequestInterface
-$psr7Response = $middlewareDispatcher->handle($psr7ServerRequest); 
+$psr7Response = $dispatcher->handle($psr7ServerRequest); 
 ```
 
-Usage of the dispatcher behaving as a PSR-15 middlware:
+The dispatcher can behace as a PSR-15 [`MiddlewareInterface`](https://www.php-fig.org/psr/psr-15/#22-psrhttpservermiddlewareinterface) using [`DispatcherMiddlewareWrapper`](src/DispatcherMiddlewareWrapper.php):
 ```php
 <?php
-use CodeInc\MiddlewareDispatcher\MiddlewareDispatcher;
+use CodeInc\MiddlewareDispatcher\Dispatcher;
+use CodeInc\MiddlewareDispatcher\DispatcherMiddlewareWrapper;
 
 // instantiating the dispatcher
-$middlewareDispatcher = new MiddlewareDispatcher([
+$dispatcher = new Dispatcher([
     new MyFirstMiddleware(),
     new MySecondMiddleware(),
     new MyThirdMiddleware()
@@ -39,7 +42,7 @@ $middlewareDispatcher = new MiddlewareDispatcher([
 // handling the request 
 // --> $psr7ServerRequest must be an object implementing ServerRequestInterface
 // --> $psr15RequestHandler must be an object implementing RequestHandlerInterface
-$psr7Response = $middlewareDispatcher->process($psr7ServerRequest, $psr15RequestHandler); 
+$psr7Response = (new DispatcherMiddlewareWrapper($dispatcher))->process($psr7ServerRequest, $psr15RequestHandler); 
 ``` 
 
 ## Installation

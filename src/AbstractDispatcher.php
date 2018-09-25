@@ -33,7 +33,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-abstract class AbstractMiddlewareDispatcher implements \IteratorAggregate, RequestHandlerInterface, MiddlewareInterface
+abstract class AbstractDispatcher implements \IteratorAggregate, RequestHandlerInterface
 {
     /**
      * Returns the middleware.
@@ -46,14 +46,14 @@ abstract class AbstractMiddlewareDispatcher implements \IteratorAggregate, Reque
      * @inheritdoc
      * @param ServerRequestInterface $request
      * @return null|ResponseInterface
-     * @throws MiddlewareDispatcherException
+     * @throws DispatcherException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
         while ($this->getIterator()->valid()) {
             $middleware = $this->getIterator()->current();
             if (!$middleware instanceof MiddlewareInterface) {
-                throw MiddlewareDispatcherException::notAMiddleware($middleware);
+                throw DispatcherException::notAMiddleware($middleware);
             }
             $this->getIterator()->next();
             return $middleware->process($request, $this);
@@ -64,27 +64,9 @@ abstract class AbstractMiddlewareDispatcher implements \IteratorAggregate, Reque
     }
 
     /**
-     * @inheritdoc
-     * @param ServerRequestInterface $request
-     * @param RequestHandlerInterface $handler
-     * @return ResponseInterface
-     * @throws MiddlewareDispatcherException
-     */
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
-    {
-        $resp = $this->handle($request);
-        if (!$resp instanceof NoResponseAvailable) {
-            return $resp;
-        }
-        else {
-            return $handler->handle($request);
-        }
-    }
-
-    /**
      * Alias of getMiddleware().
      *
-     * @uses AbstractMiddlewareDispatcher::getMiddleware()
+     * @uses AbstractDispatcher::getMiddleware()
      * @inheritdoc
      * @return \Generator
      */
