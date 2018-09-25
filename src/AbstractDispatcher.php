@@ -51,7 +51,15 @@ abstract class AbstractDispatcher implements MiddlewareInterface, RequestHandler
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        return $this->process($request, $this);
+        while ($this->getIterator()->valid()) {
+            $middleware = $this->getIterator()->current();
+            if (!$middleware instanceof MiddlewareInterface) {
+                throw DispatcherException::notAMiddleware($middleware);
+            }
+            $this->getIterator()->next();
+            return $middleware->process($request, $this);
+        }
+        return new NoResponseAvailable();
     }
 
     /**
@@ -62,17 +70,11 @@ abstract class AbstractDispatcher implements MiddlewareInterface, RequestHandler
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        while ($this->getIterator()->valid()) {
-            $middleware = $this->getIterator()->current();
-            if (!$middleware instanceof MiddlewareInterface) {
-                throw DispatcherException::notAMiddleware($middleware);
-            }
-            $this->getIterator()->next();
-            return $middleware->process($request, $this);
+        $response = $this->handle($request);
+        if (!$response instanceof NoResponseAvailable) {
+            return $response;
         }
-
-        // if no middleware generated a response, sending NoResponseAvailable response
-        return new NoResponseAvailable();
+        return $handler->handle($request);
     }
 
     /**
