@@ -19,31 +19,24 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher;
+namespace CodeInc\MiddlewareDispatcher\DispatcherIterator;
+use CodeInc\MiddlewareDispatcher\AbstractDispatcher;
 
 
 /**
- * Class DispatcherIterator
+ * Class AbstractDispatcherIterator
  *
- * @package CodeInc\MiddlewareDispatcher
+ * @package CodeInc\MiddlewareDispatcher\DispatcherIterator
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DispatcherIterator implements \IteratorAggregate
+abstract class AbstractDispatcherIterator implements \IteratorAggregate
 {
     /**
-     * @var AbstractDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * DispatcherIterator constructor.
+     * Returns the middleware dispatcher.
      *
-     * @param AbstractDispatcher $dispatcher
+     * @return AbstractDispatcher
      */
-    public function __construct(AbstractDispatcher $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
+    abstract protected function getDispatcher():AbstractDispatcher;
 
     /**
      * @inheritdoc
@@ -51,6 +44,6 @@ class DispatcherIterator implements \IteratorAggregate
      */
     public function getIterator():\Generator
     {
-        yield from $this->dispatcher->getMiddleware();
+        yield from $this->getDispatcher()->getMiddleware();
     }
 }

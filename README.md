@@ -30,7 +30,7 @@ The dispatcher can behace as a PSR-15 [`MiddlewareInterface`](https://www.php-fi
 ```php
 <?php
 use CodeInc\MiddlewareDispatcher\Dispatcher;
-use CodeInc\MiddlewareDispatcher\DispatcherMiddlewareWrapper;
+use CodeInc\MiddlewareDispatcher\MiddlewareWrapper\DispatcherMiddlewareWrapper;
 
 // instantiating the dispatcher
 $dispatcher = new Dispatcher([
@@ -49,7 +49,7 @@ You can use the dispatcher as [an iterator](http://php.net/manual/fr/class.itera
 ```php
 <?php
 use CodeInc\MiddlewareDispatcher\Dispatcher;
-use CodeInc\MiddlewareDispatcher\DispatcherIterator;
+use CodeInc\MiddlewareDispatcher\DispatcherIterator\DispatcherIterator;
 
 // instantiating the dispatcher
 $dispatcher = new Dispatcher([

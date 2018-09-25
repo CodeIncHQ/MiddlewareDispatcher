@@ -19,7 +19,10 @@
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher;
+namespace CodeInc\MiddlewareDispatcher\MiddlewareWrapper;
+use CodeInc\MiddlewareDispatcher\AbstractDispatcher;
+use CodeInc\MiddlewareDispatcher\DispatcherException;
+use CodeInc\MiddlewareDispatcher\NoResponseAvailable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -27,27 +30,17 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class DispatcherMiddlewareWrapper
+ * Class AbstractDispatcherMiddlewareWrapper
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DispatcherMiddlewareWrapper implements MiddlewareInterface
+abstract class AbstractDispatcherMiddlewareWrapper implements MiddlewareInterface
 {
     /**
-     * @var AbstractDispatcher
+     * @return AbstractDispatcher
      */
-    private $dispatcher;
-
-    /**
-     * DispatcherMiddlewareWrapper constructor.
-     *
-     * @param AbstractDispatcher $dispatcher
-     */
-    public function __construct(AbstractDispatcher $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
+    abstract protected function getDispatcher():AbstractDispatcher;
 
     /**
      * @inheritdoc
@@ -58,7 +51,7 @@ class DispatcherMiddlewareWrapper implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler):ResponseInterface
     {
-        $resp = $this->dispatcher->handle($request);
+        $resp = $this->getDispatcher()->handle($request);
         if (!$resp instanceof NoResponseAvailable) {
             return $resp;
         }
