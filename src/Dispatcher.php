@@ -55,7 +55,7 @@ final class Dispatcher extends AbstractDispatcher
         if ($middleware instanceof \Traversable) {
             $this->middlewareIterator = $middleware;
         }
-        else if ($middleware !== null) {
+        elseif ($middleware !== null) {
             foreach ($middleware as $item) {
                 if (!$item instanceof MiddlewareInterface) {
                     throw DispatcherException::notAMiddleware($item);
@@ -90,8 +90,8 @@ final class Dispatcher extends AbstractDispatcher
                 yield $middleware;
             }
         }
-        if (!empty($this->middlewareRegistry)) {
-            yield from $this->middlewareRegistry;
+        foreach ($this->middlewareRegistry as $middleware) {
+            yield $middleware;
         }
     }
 }
