@@ -35,14 +35,14 @@ use Psr\Http\Server\RequestHandlerInterface;
  * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
  * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-abstract class AbstractDispatcher implements \IteratorAggregate, RequestHandlerInterface
+abstract class AbstractDispatcher implements RequestHandlerInterface
 {
     /**
      * Returns the middleware.
      *
-     * @return \Iterator|MiddlewareInterface[]
+     * @return iterable|MiddlewareInterface[]
      */
-    abstract public function getMiddleware():\Iterator;
+    abstract public function getMiddleware():iterable;
 
     /**
      * @inheritdoc
@@ -69,11 +69,10 @@ abstract class AbstractDispatcher implements \IteratorAggregate, RequestHandlerI
      * Alias of getMiddleware().
      *
      * @uses AbstractDispatcher::getMiddleware()
-     * @inheritdoc
      * @return \Generator
      */
-    public function getIterator():\Generator
+    private function getIterator():\Generator
     {
-        return $this->getMiddleware();
+        yield from $this->getMiddleware();
     }
 }

@@ -69,10 +69,10 @@ final class Dispatcher extends AbstractDispatcher
 
     /**
      * @inheritdoc
-     * @return iterable
+     * @return MiddlewareInterface[]
      */
-    public function getMiddleware():\Iterator
+    public function getMiddleware():iterable
     {
-        return new \ArrayIterator($this->middleware);
+        return $this->middleware;
     }
 }

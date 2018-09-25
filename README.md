@@ -45,6 +45,24 @@ $dispatcher = new Dispatcher([
 $psr7Response = (new DispatcherMiddlewareWrapper($dispatcher))->process($psr7ServerRequest, $psr15RequestHandler); 
 ``` 
 
+You can use the dispatcher as [an iterator](http://php.net/manual/fr/class.iterator.php) with [`DispatcherIterator`](src/DispatcherIterator.php):
+```php
+<?php
+use CodeInc\MiddlewareDispatcher\Dispatcher;
+use CodeInc\MiddlewareDispatcher\DispatcherIterator;
+
+// instantiating the dispatcher
+$dispatcher = new Dispatcher([
+    new MyFirstMiddleware(),
+    new MySecondMiddleware(),
+    new MyThirdMiddleware()
+]); 
+foreach (new DispatcherIterator($dispatcher) as $middleware) {
+    // [...]
+} 
+``` 
+
+
 ## Installation
 
 This library is available through [Packagist](https://packagist.org/packages/codeinc/middleware-dispatcher) and can be installed using [Composer](https://getcomposer.org/): 
