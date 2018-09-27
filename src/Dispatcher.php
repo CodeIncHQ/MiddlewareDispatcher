@@ -69,7 +69,7 @@ final class Dispatcher extends AbstractDispatcher
 
     /**
      * @inheritdoc
-     * @return \Generator|MiddlewareInterface[]
+     * @return MiddlewareInterface[]
      */
     public function getMiddleware():iterable
     {
