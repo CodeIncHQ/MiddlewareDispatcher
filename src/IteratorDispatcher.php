@@ -21,7 +21,6 @@
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
-use Psr\Http\Server\MiddlewareInterface;
 
 
 /**
@@ -32,47 +31,29 @@ use Psr\Http\Server\MiddlewareInterface;
  * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
  * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-final class Dispatcher extends AbstractDispatcher
+final class IteratorDispatcher extends AbstractDispatcher
 {
     /**
-     * @var MiddlewareInterface[]
+     * @var \Traversable
      */
-    private $middleware = [];
+    private $middlewareIterator;
 
     /**
      * Dispatcher constructor.
      *
-     * @param iterable|null $middleware
-     * @throws DispatcherException
+     * @param \Traversable $iterator
      */
-    public function __construct(?iterable $middleware = null)
+    public function __construct(\Traversable $iterator)
     {
-        if ($middleware !== null) {
-            foreach ($middleware as $item) {
-                if (!$item instanceof MiddlewareInterface) {
-                    throw DispatcherException::notAMiddleware($item);
-                }
-                $this->addMiddleware($item);
-            }
-        }
-    }
-
-    /**
-     * Adds a middleware to the dispatcher.
-     *
-     * @param MiddlewareInterface $middleware
-     */
-    public function addMiddleware(MiddlewareInterface $middleware):void
-    {
-        $this->middleware[] = $middleware;
+        $this->middlewareIterator = $iterator;
     }
 
     /**
      * @inheritdoc
-     * @return \Generator|MiddlewareInterface[]
+     * @return \Traversable
      */
     public function getMiddleware():iterable
     {
-        return $this->middleware;
+        return $this->middlewareIterator;
     }
 }

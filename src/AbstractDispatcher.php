@@ -85,6 +85,12 @@ abstract class AbstractDispatcher implements MiddlewareInterface, RequestHandler
      */
     private function getIterator():\Generator
     {
-        yield from $this->getMiddleware();
+        $middleware = $this->getMiddleware();
+        if (is_array($middleware)) {
+            return new \ArrayIterator($middleware);
+        }
+        else {
+            return $middleware;
+        }
     }
 }
