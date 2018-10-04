@@ -28,84 +28,64 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class MiddlewareDispatcher
+ * Class AbstractMiddlewareDispatcher
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
+ * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-class MiddlewareDispatcher implements RequestHandlerInterface, \IteratorAggregate, \Countable
+abstract class AbstractDispatcher implements RequestHandlerInterface
 {
     /**
-     * @var MiddlewareInterface[]
-     */
-    private $middlewares = [];
-
-    /**
-     * @var int
-     */
-    private $pointer = 0;
-
-    /**
-     * Add a middleware
+     * Returns the middleware.
      *
-     * @param MiddlewareInterface $middleware
+     * @return iterable|MiddlewareInterface[]
      */
-    public function addMiddleware(MiddlewareInterface $middleware):void
-    {
-        $this->middlewares[] = $middleware;
-    }
+    abstract public function getMiddleware():iterable;
 
     /**
-     * @inheritdoc
      * @param ServerRequestInterface $request
      * @return ResponseInterface
+     * @throws DispatcherException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        while ($middleware = $this->getNextMiddleware()) {
+        while ($this->getIterator()->valid()) {
+            $middleware = $this->getIterator()->current();
+            if (!$middleware instanceof MiddlewareInterface) {
+                throw DispatcherException::notAMiddleware($middleware);
+            }
+            $this->getIterator()->next();
             return $middleware->process($request, $this);
         }
+        return $this->getNotFoundResponse();
+    }
 
-        // if no middleware generated a response, sending NoResponseAvailable response
+    /**
+     * Returns the final response if no middleware did generated one.
+     *
+     * @return ResponseInterface
+     */
+    protected function getNotFoundResponse():ResponseInterface
+    {
         return new NoResponseAvailable();
     }
 
     /**
-     * Returns the next middleware from withing the internal stack.
+     * Alias of getMiddleware().
      *
-     * @return null|MiddlewareInterface
+     * @uses AbstractDispatcher::getMiddleware()
+     * @return \Generator
      */
-    public function getNextMiddleware():?MiddlewareInterface
+    private function getIterator():\Generator
     {
-        if (isset($this->middlewares[$this->pointer])) {
-            return $this->middlewares[$this->pointer++];
+        $middleware = $this->getMiddleware();
+        if (is_array($middleware)) {
+            return new \ArrayIterator($middleware);
         }
-        return null;
-    }
-
-    /**
-     * Resets the internal middlewares stack's pointer.
-     */
-    public function resetMiddlewarePointer():void
-    {
-        $this->pointer = 0;
-    }
-
-    /**
-     * @inheritdoc
-     * @return \ArrayIterator
-     */
-    public function getIterator():\ArrayIterator
-    {
-        return new \ArrayIterator($this->middlewares);
-    }
-
-    /**
-     * @inheritdoc
-     * @return int
-     */
-    public function count():int
-    {
-        return count($this->middlewares);
+        else {
+            return $middleware;
+        }
     }
 }

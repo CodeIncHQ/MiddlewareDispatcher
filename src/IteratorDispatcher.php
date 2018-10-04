@@ -16,47 +16,44 @@
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
 // Date:     10/04/2018
-// Time:     18:59
+// Time:     18:49
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
-use Throwable;
 
 
 /**
- * Class MiddlewareDispatcherException
+ * Class Dispatcher
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
+ * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
+ * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-class MiddlewareDispatcherException extends \Exception
+final class IteratorDispatcher extends AbstractDispatcher
 {
     /**
-     * @var MiddlewareDispatcher
+     * @var \Traversable
      */
-    private $middlewareDispatcher;
+    private $middlewareIterator;
 
     /**
-     * MiddlewareDispatcherException constructor.
+     * Dispatcher constructor.
      *
-     * @param string $message
-     * @param MiddlewareDispatcher $middlewareDispatcher
-     * @param int $code
-     * @param Throwable|null $previous
+     * @param \Traversable $iterator
      */
-    public function __construct(string $message, MiddlewareDispatcher $middlewareDispatcher,
-        int $code = 0, Throwable $previous = null)
+    public function __construct(\Traversable $iterator)
     {
-        $this->middlewareDispatcher = $middlewareDispatcher;
-        parent::__construct($message, $code, $previous);
+        $this->middlewareIterator = $iterator;
     }
 
     /**
-     * @return MiddlewareDispatcher
+     * @inheritdoc
+     * @return \Traversable
      */
-    public function getMiddlewareDispatcher():MiddlewareDispatcher
+    public function getMiddleware():iterable
     {
-        return $this->middlewareDispatcher;
+        return $this->middlewareIterator;
     }
 }
