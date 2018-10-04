@@ -28,7 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractMiddlewareDispatcher
+ * Class AbstractDispatcher
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
