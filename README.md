@@ -22,27 +22,24 @@ $dispatcher->addMiddleware(new MyThirdMiddleware());
 // will return a NoResponseAvailable object if the request can not be processed by the middleware
 // --> $psr7ServerRequest must be an object implementing ServerRequestInterface
 $psr7Response = $dispatcher->handle($psr7ServerRequest); 
-
-// the dispatcher can also be used has a PSR-15 middleware
-$psr7Response = $dispatcher->process($psr7ServerRequest, $psr15RequestHandler); 
 ```
 
-You can use the dispatcher as [an iterator](http://php.net/manual/fr/class.iterator.php) with [`DispatcherIterator`](src/DispatcherIterator.php):
+An alternative dispatcher called [`IteratorDispatcher`](src/IteratorDispatcher.php) allows to use an iterator as source for the dispatcher. Below is an example using a [generator](http://php.net/manual/en/language.generators.overview.php). In this example, the middleware objects are instantiated on the fly. This avoids instantiating unsued middleware objects. If the first middleware is capable of generating a valid response, the next ones will never be instantiated.
+
 ```php
 <?php
-use CodeInc\MiddlewareDispatcher\Dispatcher;
-use CodeInc\MiddlewareDispatcher\DispatcherIterator\DispatcherIterator;
+use CodeInc\MiddlewareDispatcher\IteratorDispatcher;
 
-// instantiating the dispatcher
-$dispatcher = new Dispatcher([
-    new MyFirstMiddleware(),
-    new MySecondMiddleware(),
-    new MyThirdMiddleware()
-]); 
-foreach (new DispatcherIterator($dispatcher) as $middleware) {
-    // [...]
-} 
-``` 
+function getMiddleware():Generator 
+{
+    yield new MyFirstMiddleware();
+    yield new MySecondMiddleware();
+    yield new MyThirdMiddleware();
+}
+
+$dispatcher = new IteratorDispatcher(getMiddleware());
+$psr7Response = $dispatcher->handle($psr7ServerRequest); 
+```
 
 
 ## Installation
