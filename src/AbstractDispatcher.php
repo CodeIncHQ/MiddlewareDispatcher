@@ -59,17 +59,17 @@ abstract class AbstractDispatcher implements RequestHandlerInterface
             $this->getIterator()->next();
             return $middleware->process($request, $this);
         }
-        return $this->getNotFoundResponse();
+        return $this->getFinalRequestHandler()->handle($request);
     }
 
     /**
-     * Returns the final response if no middleware did generated one.
+     * Returns the final request handler called if no middleware handled the response.
      *
-     * @return ResponseInterface
+     * @return RequestHandlerInterface
      */
-    protected function getNotFoundResponse():ResponseInterface
+    protected function getFinalRequestHandler():RequestHandlerInterface
     {
-        return new NoResponseAvailable();
+        return new DefaultFinalRequestHandler();
     }
 
     /**

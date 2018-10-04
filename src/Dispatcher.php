@@ -22,6 +22,7 @@
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
@@ -40,12 +41,18 @@ final class Dispatcher extends AbstractDispatcher
     private $middleware = [];
 
     /**
+     * @var RequestHandlerInterface|null
+     */
+    private $finalRequestHandler;
+
+    /**
      * Dispatcher constructor.
      *
      * @param iterable|null $middleware
+     * @param null|RequestHandlerInterface $finalRequestHandler
      * @throws DispatcherException
      */
-    public function __construct(?iterable $middleware = null)
+    public function __construct(?iterable $middleware = null, ?RequestHandlerInterface $finalRequestHandler = null)
     {
         if ($middleware !== null) {
             foreach ($middleware as $item) {
@@ -55,6 +62,16 @@ final class Dispatcher extends AbstractDispatcher
                 $this->addMiddleware($item);
             }
         }
+        $this->finalRequestHandler = $finalRequestHandler;
+    }
+
+    /**
+     * @inheritdoc
+     * @return RequestHandlerInterface
+     */
+    protected function getFinalRequestHandler():RequestHandlerInterface
+    {
+        return $this->finalRequestHandler ?? parent::getFinalRequestHandler();
     }
 
     /**
