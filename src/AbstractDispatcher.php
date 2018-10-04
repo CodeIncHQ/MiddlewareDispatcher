@@ -38,6 +38,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 abstract class AbstractDispatcher implements RequestHandlerInterface
 {
     /**
+     * @var \Iterator|null
+     */
+    private $middlewareIterator;
+
+    /**
      * Returns the middleware.
      *
      * @return iterable|MiddlewareInterface[]
@@ -51,14 +56,28 @@ abstract class AbstractDispatcher implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
-        while ($this->getIterator()->valid()) {
-            $middleware = $this->getIterator()->current();
+        if (!$this->middlewareIterator) {
+            $middleware = $this->getMiddleware();
+            if ($middleware instanceof \Iterator) {
+                $this->middlewareIterator = $middleware;
+            }
+            elseif ($middleware instanceof \IteratorAggregate) {
+                $this->middlewareIterator = $middleware->getIterator();
+            }
+            else {
+                $this->middlewareIterator = new \ArrayIterator($middleware);
+            }
+            $this->middlewareIterator->rewind();
+        }
+        while ($this->middlewareIterator->valid()) {
+            $middleware = $this->middlewareIterator->current();
             if (!$middleware instanceof MiddlewareInterface) {
                 throw DispatcherException::notAMiddleware($middleware);
             }
-            $this->getIterator()->next();
+            $this->middlewareIterator->next();
             return $middleware->process($request, $this);
         }
+        $this->middlewareIterator = null;
         return $this->getFinalRequestHandler()->handle($request);
     }
 
@@ -70,22 +89,5 @@ abstract class AbstractDispatcher implements RequestHandlerInterface
     protected function getFinalRequestHandler():RequestHandlerInterface
     {
         return new DefaultFinalRequestHandler();
-    }
-
-    /**
-     * Alias of getMiddleware().
-     *
-     * @uses AbstractDispatcher::getMiddleware()
-     * @return \Generator
-     */
-    private function getIterator():\Generator
-    {
-        $middleware = $this->getMiddleware();
-        if (is_array($middleware)) {
-            return new \ArrayIterator($middleware);
-        }
-        else {
-            return $middleware;
-        }
     }
 }
