@@ -8,7 +8,7 @@
   "require": {
     "php": ">=7.1",
     "psr/http-server-middleware": "^1.0",
-    "codeinc/psr7-responses": "^1.0",
+    "codeinc/psr7-responses": "^2",
     "codeinc/collection-interface": "^1.1"
   },
   "require-dev": {
