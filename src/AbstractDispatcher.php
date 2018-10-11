@@ -82,7 +82,7 @@ abstract class AbstractDispatcher implements RequestHandlerInterface
     }
 
     /**
-     * Returns the final request handler called if no middleware handled the response.
+     * Returns the final PSR-15 request handler called if no middleware can process the request.
      *
      * @return RequestHandlerInterface
      */
