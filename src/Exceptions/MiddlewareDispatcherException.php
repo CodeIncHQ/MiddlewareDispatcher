@@ -15,30 +15,19 @@
 // +---------------------------------------------------------------------+
 //
 // Author:   Joan Fabrégat <joan@codeinc.fr>
-// Date:     24/09/2018
+// Date:     11/10/2018
 // Project:  MiddlewareDispatcher
 //
 declare(strict_types=1);
-namespace CodeInc\MiddlewareDispatcher;
+namespace CodeInc\MiddlewareDispatcher\Exceptions;
 
 /**
- * Class DispatcherException
+ * Interface MiddlewareDispatcherException
  *
- * @package CodeInc\MiddlewareDispatcher
+ * @package CodeInc\MiddlewareDispatcher\Exceptions
  * @author Joan Fabrégat <joan@codeinc.fr>
  */
-class DispatcherException extends \Exception
+interface MiddlewareDispatcherException
 {
-    public const CODE_NOT_A_MIDDLEWARE = 1;
 
-    /**
-     * @param $item
-     * @return DispatcherException
-     */
-    public static function notAMiddleware($item):self
-    {
-        return new self(sprintf("The item '%s' is not a middleware and can not be used with the dispatcher. "
-            ."All middleware muse implement '%s'.", is_object($item) ? get_class($item) : (string)$item),
-            self::CODE_NOT_A_MIDDLEWARE);
-    }
 }

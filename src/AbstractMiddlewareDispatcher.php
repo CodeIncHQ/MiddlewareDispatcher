@@ -52,7 +52,7 @@ abstract class AbstractMiddlewareDispatcher implements RequestHandlerInterface
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
-     * @throws DispatcherException
+     * @throws MiddlewareDispatcherException
      */
     public function handle(ServerRequestInterface $request):ResponseInterface
     {
@@ -72,7 +72,7 @@ abstract class AbstractMiddlewareDispatcher implements RequestHandlerInterface
         while ($this->middlewareIterator->valid()) {
             $middleware = $this->middlewareIterator->current();
             if (!$middleware instanceof MiddlewareInterface) {
-                throw DispatcherException::notAMiddleware($middleware);
+                throw MiddlewareDispatcherException::notAMiddleware($middleware);
             }
             $this->middlewareIterator->next();
             return $middleware->process($request, $this);
