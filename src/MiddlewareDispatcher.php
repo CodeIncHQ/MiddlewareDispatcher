@@ -21,6 +21,7 @@
 //
 declare(strict_types=1);
 namespace CodeInc\MiddlewareDispatcher;
+use CodeInc\MiddlewareDispatcher\Exceptions\NotAMiddlewareException;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -54,14 +55,14 @@ final class MiddlewareDispatcher extends AbstractMiddlewareDispatcher
      *
      * @param iterable|null $middleware
      * @param null|RequestHandlerInterface $finalRequestHandler
-     * @throws DispatcherException
+     * @throws NotAMiddlewareException
      */
     public function __construct(?iterable $middleware = null, ?RequestHandlerInterface $finalRequestHandler = null)
     {
         if ($middleware !== null) {
             foreach ($middleware as $item) {
                 if (!$item instanceof MiddlewareInterface) {
-                    throw DispatcherException::notAMiddleware($item);
+                    throw new NotAMiddlewareException($item);
                 }
                 $this->addMiddleware($item);
             }
