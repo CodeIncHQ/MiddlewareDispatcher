@@ -15,9 +15,7 @@
     "phpunit/phpunit": "^7"
   },
   "suggest": {
-    "codeinc/services-manager": "Required to use ServiceManagerInstantiator",
-    "codeinc/psr7-response-sender": "A PSR-7 response sender",
-    "codeinc/psr15-middlewares": "Provides a collection of PSR15 middlewares"
+    "codeinc/psr7-response-sender": "A PSR-7 response sender"
   },
   "autoload": {
     "psr-4": {"CodeInc\\MiddlewareDispatcher\\": "src/"}
