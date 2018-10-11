@@ -24,14 +24,14 @@ namespace CodeInc\MiddlewareDispatcher;
 
 
 /**
- * Class Dispatcher
+ * Class MiddlewareIteratorDispatcher
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
  * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-final class IteratorDispatcher extends AbstractDispatcher
+final class MiddlewareIteratorDispatcher extends AbstractMiddlewareDispatcher
 {
     /**
      * @var \Traversable
@@ -39,7 +39,7 @@ final class IteratorDispatcher extends AbstractDispatcher
     private $middlewareIterator;
 
     /**
-     * Dispatcher constructor.
+     * MiddlewareIteratorDispatcher constructor.
      *
      * @param \Traversable $iterator
      */
