@@ -28,14 +28,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class AbstractDispatcher
+ * Class AbstractMiddlewareDispatcher
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
  * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-abstract class AbstractDispatcher implements RequestHandlerInterface
+abstract class AbstractMiddlewareDispatcher implements RequestHandlerInterface
 {
     /**
      * @var \Iterator|null

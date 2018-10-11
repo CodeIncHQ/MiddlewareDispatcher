@@ -26,14 +26,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 
 /**
- * Class Dispatcher
+ * Class MiddlewareDispatcher
  *
  * @package CodeInc\MiddlewareDispatcher
  * @author Joan Fabrégat <joan@codeinc.fr>
  * @license MIT <https://github.com/CodeIncHQ/MiddlewareDispatcher/blob/master/LICENSE>
  * @link https://github.com/CodeIncHQ/MiddlewareDispatcher
  */
-final class Dispatcher extends AbstractDispatcher
+final class MiddlewareDispatcher extends AbstractMiddlewareDispatcher
 {
     /**
      * @var MiddlewareInterface[]
@@ -43,14 +43,14 @@ final class Dispatcher extends AbstractDispatcher
     /**
      * Final PSR-15 request handler called if no middleware can process the request.
      *
-     * @see Dispatcher::getFinalRequestHandler()
-     * @see Dispatcher::setFinalRequestHandler()
+     * @see MiddlewareDispatcher::getFinalRequestHandler()
+     * @see MiddlewareDispatcher::setFinalRequestHandler()
      * @var RequestHandlerInterface|null
      */
     private $finalRequestHandler;
 
     /**
-     * Dispatcher constructor.
+     * MiddlewareDispatcher constructor.
      *
      * @param iterable|null $middleware
      * @param null|RequestHandlerInterface $finalRequestHandler
