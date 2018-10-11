@@ -1,6 +1,6 @@
 {
   "name": "codeinc/middleware-dispatcher",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "Code Inc. PSR15 middleware dispatcher",
   "homepage": "https://github.com/CodeIncHQ/MiddlewareDispatcher",
   "type": "library",
