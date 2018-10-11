@@ -41,6 +41,10 @@ final class Dispatcher extends AbstractDispatcher
     private $middleware = [];
 
     /**
+     * Final PSR-15 request handler called if no middleware can process the request.
+     *
+     * @see Dispatcher::getFinalRequestHandler()
+     * @see Dispatcher::setFinalRequestHandler()
      * @var RequestHandlerInterface|null
      */
     private $finalRequestHandler;
@@ -69,9 +73,19 @@ final class Dispatcher extends AbstractDispatcher
      * @inheritdoc
      * @return RequestHandlerInterface
      */
-    protected function getFinalRequestHandler():RequestHandlerInterface
+    public function getFinalRequestHandler():RequestHandlerInterface
     {
         return $this->finalRequestHandler ?? parent::getFinalRequestHandler();
+    }
+
+    /**
+     * Sets the final PSR-15 request handler called if no middleware can process the request.
+     *
+     * @param RequestHandlerInterface $finalRequestHandler
+     */
+    public function setFinalRequestHandler(RequestHandlerInterface $finalRequestHandler):void
+    {
+        $this->finalRequestHandler = $finalRequestHandler;
     }
 
     /**
