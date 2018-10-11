@@ -1,6 +1,6 @@
 {
   "name": "codeinc/middleware-dispatcher",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Code Inc. PSR15 middleware dispatcher",
   "homepage": "https://github.com/CodeIncHQ/MiddlewareDispatcher",
   "type": "library",
@@ -15,9 +15,7 @@
     "phpunit/phpunit": "^7"
   },
   "suggest": {
-    "codeinc/services-manager": "Required to use ServiceManagerInstantiator",
-    "codeinc/psr7-response-sender": "A PSR-7 response sender",
-    "codeinc/psr15-middlewares": "Provides a collection of PSR15 middlewares"
+    "codeinc/psr7-response-sender": "A PSR-7 response sender"
   },
   "autoload": {
     "psr-4": {"CodeInc\\MiddlewareDispatcher\\": "src/"}
